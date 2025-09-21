@@ -1,0 +1,5 @@
+{
+  "name": "AI Content Creator Studio",
+  "description": "An AI-powered assistant to generate complete blog posts or podcast scripts from a simple topic. It creates titles, content, social media promotions, and suggests relevant imagery.",
+  "requestFramePermissions": []
+}
