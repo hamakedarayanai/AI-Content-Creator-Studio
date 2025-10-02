@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import type { GeneratedContent, ContentType } from '../types';
 
@@ -17,7 +16,7 @@ const schema = {
     },
     script: { 
       type: Type.STRING, 
-      description: 'The full blog post or podcast script, formatted with paragraphs and clear sections. Use markdown for headings (e.g., ## Section Title).' 
+      description: 'The full blog post or podcast script, formatted with paragraphs and clear sections. Use markdown for headings (e.g., ## Section Title), bold text (**bold**), and italics (*italic*).' 
     },
     imageSuggestions: {
       type: Type.ARRAY,
@@ -50,7 +49,7 @@ export async function generateContentBundle(topic: string, contentType: ContentT
     
     Please generate the following:
     1.  A compelling title.
-    2.  A well-structured ${contentType} script/article. For a podcast, include cues like [INTRO MUSIC] or [HOST]. For a blog, use markdown for structure.
+    2.  A well-structured ${contentType} script/article. For a podcast, include cues like [INTRO MUSIC] or [HOST]. For a blog, use markdown for structure (headings, bold, italics).
     3.  Three descriptive prompts for generating relevant, high-quality images.
     4.  Two or three engaging social media posts to promote the content on platforms like Twitter and LinkedIn.
 
@@ -88,5 +87,31 @@ export async function generateContentBundle(topic: string, contentType: ContentT
         throw new Error(`Failed to generate content from AI: ${error.message}`);
     }
     throw new Error("An unknown error occurred while generating content.");
+  }
+}
+
+export async function generateImage(prompt: string): Promise<string> {
+  try {
+    const response = await ai.models.generateImages({
+        model: 'imagen-4.0-generate-001',
+        prompt: prompt,
+        config: {
+          numberOfImages: 1,
+          outputMimeType: 'image/jpeg',
+          aspectRatio: '4:3',
+        },
+    });
+
+    const base64ImageBytes = response.generatedImages[0]?.image?.imageBytes;
+    if (!base64ImageBytes) {
+        throw new Error("No image data returned from API.");
+    }
+    return `data:image/jpeg;base64,${base64ImageBytes}`;
+  } catch (error) {
+    console.error("Error generating image:", error);
+    if (error instanceof Error) {
+        throw new Error(`Failed to generate image from AI: ${error.message}`);
+    }
+    throw new Error("An unknown error occurred while generating the image.");
   }
 }
